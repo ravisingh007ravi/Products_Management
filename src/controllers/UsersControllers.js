@@ -1,39 +1,8 @@
 
 const UserModel = require("../models/UsersModels");
+const aws= require("../aws/aws")
 const bcrypt = require ('bcrypt');
-const aws= require("aws-sdk")
 const jwt= require("jsonwebtoken")
-
-aws.config.update({
-    accessKeyId: "AKIAY3L35MCRZNIRGT6N",
-    secretAccessKey: "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",
-    region: "ap-south-1"
-})
-
-let uploadFile= async ( file) =>{
-   return new Promise( function(resolve, reject) {
-    
-    let s3= new aws.S3({apiVersion: '2006-03-01'}); 
-
-    var uploadParams= {
-        ACL: "public-read",
-        Bucket: "classroom-training-bucket",  
-        Key: "abc/" + file.originalname, 
-        Body: file.buffer
-    }
-
-
-    s3.upload( uploadParams, function (err, data ){
-        if(err) {
-            return reject({"error": err})
-        }
-          
-        return resolve(data.Location)
-    })  
-
-   })
-}
-
 
 const createUsers = async function (req, res) {
     try{
@@ -42,16 +11,21 @@ const createUsers = async function (req, res) {
         let files= req.files
         if(files && files.length>0){
             
-             uploadedFileURL= await uploadFile( files[0] )           
+             uploadedFileURL= await aws.uploadFile( files[0] )           
         }
         else{
            return  res.status(400).send({ msg: "No file found" })
         }
 
       let data= req.body.data
+      console.log(data)
+
+      
    
    data= JSON.parse(data)
-     
+   console.log(data)
+   
+
      const saltRounds = 2;
          const password = data.password;
 
@@ -76,58 +50,75 @@ let data1= await UserModel.create(data)
 
 }
 
-// //___________________login______________________________//
+//___________________login______________________________//
 
-// const UsersLogin= async function(req,res){
-//     try{
-//         let plaintextPassword= req.body.password
-//         let email= req.body.email
-//         let dataPresent= await UserModel.findOne({email:email})
-//        let encryptedPassword=  dataPresent.password
+const UsersLogin= async function(req,res){
+    try{
+        let plaintextPassword= req.body.password
+        let email= req.body.email
+        let dataPresent= await UserModel.findOne({email:email})
+       let encryptedPassword=  dataPresent.password
 
-//      let decrypt= await  bcrypt.compare(plaintextPassword, encryptedPassword)
-//      if(!decrypt){
-//         return res.status(400).send({msg:"password is not correct"})
-//      }
+     let decrypt= await  bcrypt.compare(plaintextPassword, encryptedPassword)
+     if(!decrypt){
+        return res.status(400).send({msg:"password is not correct"})
+     }
      
      
-//      let token = jwt.sign(
-//         {
-//             userId: dataPresent._id.toString(),
-//             batch: "lithium",
-//             project: "project5"
-//         },
-//         "Secret-Key-lithium", { expiresIn: '12h' }
-//     )
+     let token = jwt.sign(
+        {
+            userId: dataPresent._id.toString(),
+            batch: "lithium",
+            project: "project5"
+        },
+        "Secret-Key-lithium", { expiresIn: '12h' }
+    )
 
-//     return res.status(201).send({status:true,message: "User login successfull",data:{userId:dataPresent._id,token:token}})
+    return res.status(201).send({status:true,message: "User login successfull",data:{userId:dataPresent._id,token:token}})
 
-//     } 
-//     catch(err){
-//         return res.status(500).send({status:false,message:err.message})
+    } 
+    catch(err){
+        return res.status(500).send({status:false,message:err.message})
         
-//     }
-// }
+    }
+}
 
 
 
 //_______________________________get:Data__________________________________//
 
 
-// const getUsersdata=async function(req,res){
-//     try{
-      
+const getUsersdata=async function(req,res){
+    try{
+        let userId= req.params.userId
+        let data= await UserModel.findOne({_id:userId})
+     
+        return res.status(200).send({status:true,data:data})
 
-//     }
-//     catch(error){
-//         return res.status(500).send({status:false,message:error.message})
-//     }
-// }
-
-
-
-
-
+    }
+    catch(error){
+        return res.status(500).send({status:false,message:error.message})
+    }
+}
 
 
-module.exports= {createUsers}
+
+// __________________________________update:Data____________________________//
+
+const updatedData=async function(req,res){
+    try{
+        let userId= req.params.userId
+        let data= req.body
+        let updatedData= await UserModel.findOneAndUpdate({_id:userId},{$set:data},{new:true})
+        return res.status(200).send({status:true,message:"updated successfully",data:updatedData})
+
+    }
+    catch(err){
+        return res.status(500).send({status:false,message:err.message})
+    }
+}
+
+
+
+
+module.exports= {createUsers,UsersLogin,getUsersdata,updatedData}
