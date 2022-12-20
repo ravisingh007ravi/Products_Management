@@ -1,11 +1,13 @@
 const express = require('express');
 const mongoose = require('mongoose');
-mongoose.set('strictQuery', true);
-const route = require('./route/routes.js')
+const multer = require('multer');
+const route = require('./route/routes.js');
 const app=express();
 const port = process.env.PORT || 3000;
 const url ="mongodb+srv://ravisingh007ravi:Ravi1234@cluster0.w9hbwbb.mongodb.net/Shoppingcart?retryWrites=true&w=majority";
+mongoose.set('strictQuery', true);
 
+app.use(multer().any());
 app.use(express.json());
 
 mongoose.connect(url)

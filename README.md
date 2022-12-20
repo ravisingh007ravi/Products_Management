@@ -60,7 +60,7 @@
     "data": {
         "fname": "John",
         "lname": "Doe",
-        "email": "johndoe@mailinator.com",
+        "email": "johndoe@mailinator.com",  
         "profileImage": "https://classroom-training-bucket.s3.ap-south-1.amazonaws.com/user/copernico-p_kICQCOM4s-unsplash.jpg",
         "phone": 9876543210,
         "password": "$2b$10$DpOSGb0B7cT0f6L95RnpWO2P/AtEoE6OF9diIiAEP7QrTMaV29Kmm",
