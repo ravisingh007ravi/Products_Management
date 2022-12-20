@@ -18,5 +18,9 @@ let validcity = /[a-zA-z ]/;
 
 let validpincode = /^[1-9]{1}[0-9]{5}$/;
 
+const ValidObjectId = function (objectId) {
+    return mongoose.Types.ObjectId.isValid(objectId);
+  }
 
-module.exports = { validname, validemail, validphone, validpassword, validstreet, validcity, validpincode }
+
+module.exports = { validname, validemail, validphone, validpassword, validstreet, validcity, validpincode, ValidObjectId }

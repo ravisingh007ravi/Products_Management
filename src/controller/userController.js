@@ -3,7 +3,7 @@ const userModel = require('../models/userModel.js');
 const aws = require('../AWS/AWS.js')
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const {validname, validemail, validphone,validpassword, validstreet, validcity, validpincode} =require('../validation/validData.js');
+const {validname, validemail, validphone,validpassword, validstreet, validcity, validpincode, ValidObjectId} =require('../validation/validData.js');
 
 
 
@@ -26,7 +26,7 @@ const createUser = async ( req, res )=>{
         let data= req.body.data
        
         data= JSON.parse(data)
-        console.log(data)
+        
          const { fname, lname, email, profileImage, phone, password, address} = data;
          const { shipping, billing} = address;
       
@@ -99,6 +99,7 @@ const logInUserData = async (req, res) => {
         const data = req.body;
 
         if(Object.keys(data).length==0) return res.status(400).send({status:false,message:"Pls provide the eamilId and password"});
+
         const { email, password } = data;
 
         if(!email) return res.status(400).send({status:false,message:"Pls provide the emailId"});
@@ -135,6 +136,8 @@ const getUserData = async (req, res) => {
 
         const id = req.params.userId;
         
+        if(!ValidObjectId(id)) return res.status(400).send({ status: false, message: "Enter a Valid User id" });
+
         const data = await userModel.findById(id);
 
         if(!data) return res.status(400).send({message:"User not present in Database Pls Provie right Id"});
@@ -169,7 +172,27 @@ const getUserData = async (req, res) => {
 
 //<----------------------< Update User Data from DataBase >------------------->//
 const updateUserData = async (req,res)=>{
+    try{
 
+        const id = req.params.userId;
+        
+        if(!ValidObjectId(id)) return res.status(400).send({ status: false, message: "Enter a Valid User id" });
+
+        const data= req.body ;
+
+        if(Object.keys(data).length==0) return res.status(400).send({status:false,message:"Body is Empty Pls provide the data"});
+
+        const { fname, lname, email, profileImage, phone, password, address} = data;
+
+         const { shipping, billing} = address;
+
+
+         const checkUser = await userModel.findById(id);
+
+        if(!checkUser) return res.status(400).send({status:false,message:"User not present in Database Pls Provie right Id"});
+
+    }
+    catch(err){ return res.status(500).send({message:err})}
 }
 
 
