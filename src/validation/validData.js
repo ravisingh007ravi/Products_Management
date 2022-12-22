@@ -6,8 +6,6 @@ let validname = /[a-zA-z]/;
 
 let validemail= /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-//let profileImage =;
-
 let validphone = /^[0]?[6789]\d{9}$/;
 
 let validpassword = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
@@ -22,5 +20,27 @@ const ValidObjectId = function (objectId) {
     return mongoose.Types.ObjectId.isValid(objectId);
   }
 
+  //<----------------------< Check : User Validation >--------------------->//
 
-module.exports = { validname, validemail, validphone, validpassword, validstreet, validcity, validpincode, ValidObjectId }
+  let validtitle =/^[a-zA-z ]|[0-9]$/;
+
+  let validPrice =/^\d+(,\d{1,2})?$/;
+
+  let validInstallments = /[0-9]/;
+  
+
+  const isValidPrice =(price)=>{
+    return /^[1-9]\d{0,7}(?:\.\d{1,2})?$/.test(price)
+  }
+  const isValid = function (value) {
+    if (typeof value === "string" && value.trim().length > 0) return true;
+    return false;
+  };
+    const isValidAvailableSizes = function(size) {
+      return ["S", "XS", "M", "X", "L", "XXL", "XL"].includes(size) == true
+    }
+
+
+ //<----------------------< Exports : Validation >------------------------>// 
+module.exports = { validname, validemail, validphone, validpassword, validstreet, validcity, validpincode, ValidObjectId,
+                    validtitle, validPrice, validInstallments, isValidPrice, isValidAvailableSizes, isValid }

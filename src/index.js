@@ -11,9 +11,9 @@ app.use(multer().any());
 app.use(express.json());
 
 mongoose.connect(url)
-.then(() => console.log("Mongoose is Connected"))
+.then(() => console.log("Mongoose is Connected😊😊"))
 .catch((err) => console.log(err));
 
 app.use('/',route);
 
-app.listen(port, () => console.log(`Server is Running Succesfully ${port}`));
+app.listen(port, () => console.log(`Server is Running Succesfully ${port}💕`));
