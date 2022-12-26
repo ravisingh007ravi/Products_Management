@@ -190,7 +190,8 @@ const updateProduct = async (req, res) => {
 
         let Updatedproduct = await productModel.findOneAndUpdate({ _id: productId }, {
             title: title, description: description,
-            price: price, currencyId: currencyId, currencyFormat: currencyFormat, availableSizes: availableSizes, installments: installments
+            price: price, currencyId: currencyId, currencyFormat: currencyFormat, availableSizes: availableSizes, 
+            installments: installments
         },
             { new: true })
 
@@ -206,7 +207,7 @@ const deleteproduct = async (req, res) => {
         let productId = req.params.productId;
 
 
-        if (!(productId)) return res.status(400).send({ status: false, msg: "Invalid productId" });
+        if (!ValidObjectId(productId)) return res.status(400).send({ status: false, message: "Invalid productId" });
 
 
         let savedData = await productModel.findById({ _id: productId })

@@ -1,4 +1,4 @@
-//<----------------------< Importing : Packages >---------------------->//
+//<---------------------------------------< Importing : Packages >------------------------------------------------->//
 const userModel = require('../models/userModel.js');
 const aws = require('../AWS/AWS.js')
 const jwt = require('jsonwebtoken');
@@ -7,33 +7,41 @@ const { validname, validemail, validphone, validpassword, validstreet, validcity
 
 
 
-//<----------------------< Create : UserFunction >--------------------->//
+//<---------------------------------------< Create : UserFunction >-------------------------------------------------->//
 const createUser = async (req, res) => {
 
     try {
 
+        let file = req.files;
         let data = req.body;
-        const file = req.files;
         let image;
         
         if (Object.keys(data).length == 0) return res.status(400).send({ status: false, message: "please input some data" });
-        let { fname, lname, email, phone, password, address } = data;
         
-        data.address = JSON.parse(address)
+        
+        
+//<~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~< Upload File with help of AWS >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>// 
 
         if (file && file.length > 0) {
-             image = await aws.uploadFile(file[0])
-             data.profileImage = image;
-             
-              }
-        else return res.status(400).send({ status: false, message: "please provide the productImage" })
+            image = await aws.uploadFile(file[0])
+            data.profileImage = image;
+            
+        }
+        else return res.status(400).send({ status: false, message: "please provide the productImage" });
+
+        
+
+        let { fname, lname, email, phone, password, address } = data;
+        
+        
          
+//<~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~< check Validation >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>// 
 
         if (!fname) return res.status(400).send({ status: false, message: "pls provide the First Name" });
-        if (!validname.test(fname.trim())) return res.status(400).send({ status: false, message: "pls provide the Valid First Name" });
+        if (!validname.test(fname)) return res.status(400).send({ status: false, message: "pls provide the Valid First Name" });
 
         if (!lname) return res.status(400).send({ status: false, message: "pls provide the Last Name" });
-        if (!validname.test(lname.trim())) return res.status(400).send({ status: false, message: "pls provide the Valid Last Name" });
+        if (!validname.test(lname)) return res.status(400).send({ status: false, message: "pls provide the Valid Last Name" });
 
         if (!email) return res.status(400).send({ status: false, message: "pls provide the Email" });
         if (!validemail.test(email.trim())) return res.status(400).send({ status: false, message: "pls provide the Valid Email" });
@@ -50,11 +58,15 @@ const createUser = async (req, res) => {
 
         data.password = await bcrypt.hash(password, 10);
 
-        if (!address) return res.status(400).send({ status: false, message: "pls provide the Address" });
-        
-        let { shipping, billing } = address;
         
         
+
+       // if (!address) return res.status(400).send({ status: false, message: "pls provide the Address" });
+        
+        //let { shipping, billing } = address;
+        console.log(address)
+        //data.address = JSON.parse(data)
+        //<~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~< checK  Addrees Validation >~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~>// 
         
         // if(!shipping) return res.status(400).send({status:false,message:"pls provide the shipping Address"});
         
@@ -79,19 +91,8 @@ const createUser = async (req, res) => {
         // let chechpin2=billing.pincode.toString();
         // if(!billing.pincode) return res.status(400).send({status:false,message:"pls provide the billing Pincode"});
         // if(!validpincode.test(chechpin2.trim())) return res.status(400).send({status:false,message:"pls provide the Valid billing Pincode"});
+         
         
-        // const data1 = {
-        //     fname: fname,
-        //     lname: lname,
-        //     email: email,
-        //     profileImage: data.productImage,
-        //     phone: phone,
-        //     //password: hash,
-        //     address: address
-
-        // }
-        
-        console.log(data.productImage);
         const result = await userModel.create(data)
        
         res.status(201).send({status:true,data:result})
